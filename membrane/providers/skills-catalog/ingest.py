@@ -27,7 +27,10 @@ from pathlib import Path
 
 # Shared, YAML-free frontmatter parser — MUST be the same implementation the delivery verifier uses,
 # or the description bytes diverge across interpreters and the delivery seal rejects real skills.
-sys.path.insert(0, "/Volumes/D/claude/tools/lib")
+WORKSPACE_ROOT = next(
+    p for p in Path(__file__).resolve().parents if (p / "tools" / "lib").is_dir()
+)  # the dir that owns tools/lib — never a machine-specific absolute path
+sys.path.insert(0, str(WORKSPACE_ROOT / "tools" / "lib"))
 from skill_frontmatter import frontmatter_description, frontmatter_name  # noqa: E402
 
 CATALOG_VERSION = 1
@@ -246,7 +249,7 @@ def main(argv: list[str]) -> int:
     except (AttributeError, ValueError):
         pass
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--root", default="D:/Claude" if sys.platform == "win32" else str(Path.home() / "claude"))
+    ap.add_argument("--root", default=str(WORKSPACE_ROOT))
     ap.add_argument("--scope", default="skills")
     ap.add_argument("--out", default=None)
     ap.add_argument("--print", action="store_true")
